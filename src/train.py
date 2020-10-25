@@ -1,26 +1,48 @@
-from src.model import
+from src.model import AutoPuncModel
+from src.data import AutoPuncDataset, POSSIBLE_LABELS
+from sys import argv
+import torch
+from torch_optimizer import RAdam, Lookahead
+from torch.utils.data import DataLoader
+from torch.nn.functional import binary_cross_entropy, one_hot
 
-for epoch in range(2):  # loop over the dataset multiple times
+OUTPUT_FILE = argv[1]
 
-    running_loss = 0.0
-    for i, data in enumerate(trainloader, 0):
-        # get the inputs; data is a list of [inputs, labels]
-        inputs, labels = data
 
-        # zero the parameter gradients
-        optimizer.zero_grad()
+def train(model, dataset, optimizer, batch_size=1000, num_epochs=9, loss_fn=binary_cross_entropy):
+    train_loader = DataLoader(dataset, batch_size, shuffle=True)
+    epoch_losses = []
+    for epoch in range(num_epochs):
+        running_loss = 0.0
+        for i, data in enumerate(train_loader, 0):
+            inputs, labels = data
+            labels = one_hot(labels, num_classes=len(POSSIBLE_LABELS)).float()
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            loss = loss_fn(outputs, labels)
+            loss.backward()
+            optimizer.step()
 
-        # forward + backward + optimize
-        outputs = net(inputs)
-        loss = criterion(outputs, labels)
-        loss.backward()
-        optimizer.step()
+            # Print statistics every 10 mini-batches
+            running_loss += loss.item()
+            if i % 1 == 0:  # temporarily 10 -> 1, 9 -> 0
+                print('[%d, %5d] loss: %.3f' %
+                      (epoch + 1, i + 1, running_loss / 2000))
+                running_loss = 0.0
 
-        # print statistics
-        running_loss += loss.item()
-        if i % 2000 == 1999:    # print every 2000 mini-batches
-            print('[%d, %5d] loss: %.3f' %
-                  (epoch + 1, i + 1, running_loss / 2000))
-            running_loss = 0.0
+        epoch_losses.append(running_loss)
+        if running_loss == max(epoch_losses):
+            torch.save(model, OUTPUT_FILE)
+            print("Finished training. Epoch losses: ", epoch_losses)
 
-print('Finished Training')
+        # TODO: call eval.evaluate() with model and validation set
+
+
+if __name__ == "__main__":
+    model = AutoPuncModel()
+    print("Loading dataset...")
+    pretrain_set = AutoPuncDataset("../data/toy_data")
+    print("Training model...")
+    radam = RAdam(model.parameters(), betas=(.9, .999), lr=1e-5, eps=1e-8)
+    lookahead_optimizer = Lookahead(radam, k=6, alpha=0.5)
+    train(model, pretrain_set, lookahead_optimizer)
