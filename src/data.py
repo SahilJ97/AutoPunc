@@ -9,7 +9,14 @@ POSSIBLE_LABELS = ['.', ',', '?', None]
 
 
 class AutoPuncDataset(Dataset):
-    def __init__(self, data_dir, max_prosodic_seq_length=500, window_size=100, pretrained="roberta-base"):
+    def __init__(
+            self,
+            data_dir,
+            max_prosodic_seq_length=500,
+            window_size=100,
+            pretrained="roberta-base",
+            n_pros_feat=4
+    ):
         self.csv_files = glob.glob(f"{data_dir}/*.data")
         self.window_size = window_size
         self.tokenizer = RobertaTokenizer.from_pretrained(pretrained)
@@ -17,6 +24,7 @@ class AutoPuncDataset(Dataset):
         self.raw_labels = []
         self.load_data()
         self.max_seq_len = max_prosodic_seq_length
+        self.n_pros_feat = n_pros_feat
 
     def load_data(self):
         for csv_file in self.csv_files:  # wait...want to normalize???
@@ -65,7 +73,7 @@ class AutoPuncDataset(Dataset):
             return speech_idx, offset
 
     def pad_and_crop_seq(self, seq):
-        zero = tuple((0. for feature in seq[0]))
+        zero = tuple((0. for i in range(self.n_pros_feat)))
         cropped = seq[max(0, len(seq)-self.max_seq_len):]  # trim the left side of the sequence
         padding = [zero for i in range(self.max_seq_len - len(seq))]
         return np.array(padding + cropped)
