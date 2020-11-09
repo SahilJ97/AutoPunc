@@ -4,8 +4,6 @@ import torch
 from torch.nn.functional import binary_cross_entropy, one_hot
 from sklearn.metrics import precision_recall_fscore_support
 
-MODEL, TEST_DIR = argv[1], argv[2]
-
 
 def evaluate(model, dataset, loss_fn=binary_cross_entropy):
     all_preds, all_labels = [], []
@@ -23,7 +21,9 @@ def evaluate(model, dataset, loss_fn=binary_cross_entropy):
 
 
 if __name__ == "__main__":
+    MODEL, TEST_DIR = argv[1], argv[2]
     # load model and test set
+    model = torch.load(MODEL)
     test_set = AutoPuncDataset(TEST_DIR)
     print("Evaluating model...")
     results = evaluate(model, test_set)

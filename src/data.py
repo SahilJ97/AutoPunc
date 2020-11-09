@@ -9,7 +9,7 @@ POSSIBLE_LABELS = ['.', ',', '?', None]
 
 
 class AutoPuncDataset(Dataset):
-    def __init__(self, data_dir, max_prosodic_seq_length=20, window_size=100, pretrained="roberta-base"):
+    def __init__(self, data_dir, max_prosodic_seq_length=500, window_size=100, pretrained="roberta-base"):
         self.csv_files = glob.glob(f"{data_dir}/*.data")
         self.window_size = window_size
         self.tokenizer = RobertaTokenizer.from_pretrained(pretrained)
@@ -19,7 +19,7 @@ class AutoPuncDataset(Dataset):
         self.max_seq_len = max_prosodic_seq_length
 
     def load_data(self):
-        for csv_file in self.csv_files:
+        for csv_file in self.csv_files:  # wait...want to normalize???
             with open(csv_file, "r") as f:
                 rows = reader(f, delimiter="\t")
                 i = -1
@@ -28,7 +28,7 @@ class AutoPuncDataset(Dataset):
                 labels = []
                 for row in rows:  # row format: "word x1 x2 ...", where each xi is a tuple of prosodic features
                     word = row[0].lower()
-                    prosodic = [eval(v) for v in row[1:]]
+                    prosodic = eval(row[1])
                     punc = None
                     if word[-1] in POSSIBLE_LABELS:
                         if len(word) <= 1 or word[-2] != '.':  # Don't add '.' label if word ends with ellipsis
@@ -66,18 +66,20 @@ class AutoPuncDataset(Dataset):
 
     def pad_and_crop_seq(self, seq):
         zero = tuple((0. for feature in seq[0]))
-        return [zero for i in range(self.max_seq_len - len(seq))] + seq[:min(len(seq), self.max_seq_len)]
+        cropped = seq[max(0, len(seq)-self.max_seq_len):]  # trim the left side of the sequence
+        padding = [zero for i in range(self.max_seq_len - len(seq))]
+        return np.array(padding + cropped)
 
     def __getitem__(self, idx):
         speech_idx, offset = self.translate_index(idx)
         speech = self.data[speech_idx]
         tokens = speech["tokens"][offset: offset + self.window_size]
         pros_feat = speech["prosodic_features"][offset: offset + self.window_size]
-        formatted_pros_feat = np.array([self.pad_and_crop_seq(seq) for seq in pros_feat])
+        formatted_pros_feat = np.stack([self.pad_and_crop_seq(seq) for seq in pros_feat])
         return (
             {
                 "tokens": torch.tensor(tokens),
-                "pros_feat": torch.tensor(formatted_pros_feat, dtype=torch.float)
+                "pros_feat": torch.from_numpy(formatted_pros_feat)
             },
             torch.tensor(self.raw_labels[speech_idx][offset: offset + self.window_size])
         )
@@ -88,7 +90,7 @@ class AutoPuncDataset(Dataset):
             yield (
                 {
                     "tokens": torch.tensor(speech["tokens"]),
-                    "pros_feat": torch.tensor(formatted_pros_feat)
+                    "pros_feat": torch.from_numpy(formatted_pros_feat)
                 },
                 torch.tensor(labels)
             )

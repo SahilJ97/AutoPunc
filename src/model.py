@@ -17,7 +17,7 @@ class AutoPuncModel(Module, ABC):
             dropout=.2,
             n_threads=1,
             text_embedding_size=768,  # depends on transformer model. 768 for RoBERTa
-            prosodic_embedding_size=3
+            prosodic_embedding_size=4
     ):
         super(AutoPuncModel, self).__init__()
         self.transformer = RobertaModel.from_pretrained(pretrained_model)

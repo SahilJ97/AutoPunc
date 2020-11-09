@@ -1,5 +1,6 @@
 from src.model import AutoPuncModel
 from src.data import AutoPuncDataset, POSSIBLE_LABELS
+from src.eval import evaluate
 from sys import argv
 import torch
 from torch_optimizer import RAdam, Lookahead
@@ -9,7 +10,7 @@ from torch.nn.functional import binary_cross_entropy, one_hot
 OUTPUT_FILE = argv[1]
 
 
-def train(model, dataset, optimizer, batch_size=1000, num_epochs=9, loss_fn=binary_cross_entropy):
+def train(model, dataset, optimizer, batch_size=1000, num_epochs=9, loss_fn=binary_cross_entropy, val_set=None):
     train_loader = DataLoader(dataset, batch_size, shuffle=True)
     epoch_losses = []
     for epoch in range(num_epochs):
@@ -32,17 +33,24 @@ def train(model, dataset, optimizer, batch_size=1000, num_epochs=9, loss_fn=bina
 
         epoch_losses.append(running_loss)
         if running_loss == max(epoch_losses):
+            print("Saving model...")
             torch.save(model, OUTPUT_FILE)
-            print("Finished training. Epoch losses: ", epoch_losses)
+            print("Model saved.")
 
-        # TODO: call eval.evaluate() with model and validation set
+        if val_set:
+            print("Validating...")
+            p, r, f, p_combined, r_combined, f_combined = evaluate(model, val_set)
+            print("p, r, f, p_combined, r_combined, f_combined: ", p, r, f, p_combined, r_combined, f_combined)
+
+    print("Finished training. Epoch losses: ", epoch_losses)
 
 
 if __name__ == "__main__":
     model = AutoPuncModel()
     print("Loading dataset...")
-    pretrain_set = AutoPuncDataset("../data/toy_data")
+    pretrain_set = AutoPuncDataset("../data/train")
+    dev_set = AutoPuncDataset("../data/dev")
     print("Training model...")
     radam = RAdam(model.parameters(), betas=(.9, .999), lr=1e-5, eps=1e-8)
     lookahead_optimizer = Lookahead(radam, k=6, alpha=0.5)
-    train(model, pretrain_set, lookahead_optimizer)
+    train(model, pretrain_set, lookahead_optimizer, val_set=dev_set)
