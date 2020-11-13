@@ -20,7 +20,8 @@ if __name__ == "__main__":
     for dir_basename, dir_contents in sets:
         new_dir = DATA_DIR.replace(DATA_DIR.split("/")[-1], dir_basename)
         if os.path.isdir(new_dir):
-            os.rmdir(new_dir)
+            shutil.rmtree(new_dir)
         os.mkdir(new_dir)
         for f in dir_contents:
             os.symlink(f, f.replace(DATA_DIR, new_dir))  # populate the data subset directory with symlinks
+
