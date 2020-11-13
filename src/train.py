@@ -68,7 +68,7 @@ def train(
     print("Finished training.")
 
 
-if __name__ == "__main__":  # FIRST NEED TO REMOVE DUPLICATE SENTENCES!!! AND MAKE SURE SESSIONS LONG ENOUGH!
+if __name__ == "__main__":
     model = AutoPuncModel()
     model.to(device)
     train_set = AutoPuncDataset("../data/train")

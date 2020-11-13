@@ -55,3 +55,4 @@ for speaker_dir in "$common_base"/WAVE/*; do
 done
 
 python3 split_data.py "$OUTPUT_DIR"
+python3 extract_pretraining.py

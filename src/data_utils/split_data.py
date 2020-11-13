@@ -9,9 +9,9 @@ DATA_DIR = sys.argv[1]
 if __name__ == "__main__":
     data_files = glob.glob(f"{DATA_DIR}/*.data")
     random.shuffle(data_files)
-    n_files = len(data_files)
-    n_train = int(round(.885 * n_files))
-    n_dev = int(round(.015 * n_files))
+    n_dev = 2
+    n_test = 5
+    n_train = len(data_files) - n_dev - n_test
     sets = [
         ("train", data_files[: n_train]),
         ("dev", data_files[n_train : n_train + n_dev]),
