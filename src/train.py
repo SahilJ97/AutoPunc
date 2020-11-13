@@ -8,15 +8,21 @@ from torch.utils.data import DataLoader
 from torch.nn.functional import binary_cross_entropy, one_hot
 
 OUTPUT_FILE = argv[1]
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(f"Using device {device}")
 
 
-def train(model, dataset, optimizer, batch_size=1000, num_epochs=9, loss_fn=binary_cross_entropy, val_set=None):
+def train(model, dataset, optimizer, batch_size=32, num_epochs=9, loss_fn=binary_cross_entropy, val_set=None):
     train_loader = DataLoader(dataset, batch_size, shuffle=True)
     epoch_losses = []
     for epoch in range(num_epochs):
+        print(f"\tBeginning epoch {epoch}...")
         running_loss = 0.0
         for i, data in enumerate(train_loader, 0):
             inputs, labels = data
+            inputs["tokens"] = inputs["tokens"].to(device)
+            inputs["pros_feat"] = inputs["pros_feat"].to(device)
+            labels = labels.to(device)
             labels = one_hot(labels, num_classes=len(POSSIBLE_LABELS)).float()
             optimizer.zero_grad()
             outputs = model(inputs)
@@ -24,12 +30,17 @@ def train(model, dataset, optimizer, batch_size=1000, num_epochs=9, loss_fn=bina
             loss.backward()
             optimizer.step()
 
-            # Print statistics every 10 mini-batches
+            # Print cumulative batch loss every 10 mini-batches
             running_loss += loss.item()
-            if i % 1 == 0:  # temporarily 10 -> 1, 9 -> 0
+            if i % 10 == 9:
                 print('[%d, %5d] loss: %.3f' %
-                      (epoch + 1, i + 1, running_loss / 2000))
-                running_loss = 0.0
+                      (epoch + 1, i + 1, running_loss / i+1)
+                )
+
+            # Checkpoint every 100 mini-batches
+            if i % 100 == 99:
+                print("Model checkpoint--saving...")
+                torch.save(model, OUTPUT_FILE.replace(".pt", "-checkpoint.pt"))
 
         epoch_losses.append(running_loss)
         if running_loss == max(epoch_losses):
@@ -42,15 +53,17 @@ def train(model, dataset, optimizer, batch_size=1000, num_epochs=9, loss_fn=bina
             p, r, f, p_combined, r_combined, f_combined = evaluate(model, val_set)
             print("p, r, f, p_combined, r_combined, f_combined: ", p, r, f, p_combined, r_combined, f_combined)
 
-    print("Finished training. Epoch losses: ", epoch_losses)
+    print("Finished training.")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # FIRST NEED TO REMOVE DUPLICATE SENTENCES!!! AND MAKE SURE SESSIONS LONG ENOUGH!
     model = AutoPuncModel()
-    print("Loading dataset...")
-    pretrain_set = AutoPuncDataset("../data/train")
+    model.to(device)
+    #train_set = AutoPuncDataset("../data/train")
     dev_set = AutoPuncDataset("../data/dev")
-    print("Training model...")
+    print("Initializing optimizer...")
     radam = RAdam(model.parameters(), betas=(.9, .999), lr=1e-5, eps=1e-8)
     lookahead_optimizer = Lookahead(radam, k=6, alpha=0.5)
-    train(model, pretrain_set, lookahead_optimizer, val_set=dev_set)
+    print("Training model...")
+    #train(model, train_set, lookahead_optimizer, val_set=dev_set)
+    train(model, dev_set, lookahead_optimizer, val_set=dev_set)

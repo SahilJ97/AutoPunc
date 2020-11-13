@@ -27,8 +27,11 @@ if __name__ == "__main__":
     # Generate data file
     with open(transcript, "r", encoding='utf-8-sig') as transcript_file:
         for key_line in transcript_file:
-            flac_basename = key_line.split("\t")[0]
-            words = next(transcript_file).strip().split()
+            flac_basename, utterance = key_line.split("\t")
+            words = utterance.strip().split()
+            if words[-1][-1] not in [".", "!", "?"]:
+                words[-1] = words[-1] + "."
+            next(transcript_file)  # ignore next line
             for i in range(len(words)):
                 word_key = f"{flac_basename}.{words[i]}.{i}"
                 prosodic = prosodic_sequences.setdefault(word_key, [])
