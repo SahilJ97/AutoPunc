@@ -50,7 +50,6 @@ class AutoPuncDataset(Dataset):
                 self.raw_labels.append(labels)
 
     def __len__(self):
-        return 200  # for dev purposes
         return sum(
             len(speech[1])+1-self.window_size for speech in self.data_map
         )
@@ -98,6 +97,6 @@ class AutoPuncDataset(Dataset):
     def get_speeches(self):
         for speech, labels in zip(self.data_map, self.raw_labels):
             yield (
-                self.get_input_window(speech, 0, len(speech)),
+                self.get_input_window(speech, 0, len(speech[1])),
                 torch.tensor(labels)
             )

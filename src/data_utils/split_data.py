@@ -19,7 +19,6 @@ if __name__ == "__main__":
     ]
     for dir_basename, dir_contents in sets:
         new_dir = DATA_DIR.replace(DATA_DIR.split("/")[-1], dir_basename)
-        shutil.rmtree(new_dir)
         if os.path.isdir(new_dir):
             os.rmdir(new_dir)
         os.mkdir(new_dir)

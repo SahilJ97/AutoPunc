@@ -85,8 +85,6 @@ class AutoPuncModel(Module, ABC):
                 "tokens": torch.unsqueeze(speech_data["tokens"][i:i+self.window_size], dim=0),
                 "pros_feat": torch.unsqueeze(speech_data["pros_feat"][i:i + self.window_size], dim=0)
             }
-            print(window["tokens"].size())  # always just 2 tokens for some wack reason...
-            print(window["pros_feat"].size())
             context_predictions.append(self.forward(window)[0])
         aggregated_probs = context_predictions[0]
         for cp in context_predictions[1:]:
@@ -97,5 +95,3 @@ class AutoPuncModel(Module, ABC):
             ):
                 aggregated_probs[i] = aggregated_probs[i] + cp[j]
         return torch.stack(aggregated_probs)
-
-
