@@ -74,7 +74,7 @@ class AutoPuncModel(Module, ABC):
         hidden_vecs = relu(torch.stack(hidden_vecs))
         normalized = self.batch_norm(hidden_vecs)
         normalized = self.dropout_layer(normalized)
-        probs = softmax(self.final_layer(normalized), dim=0)
+        probs = softmax(self.final_layer(normalized), dim=-1)
         return probs
 
     def predict(self, speech_data):

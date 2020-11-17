@@ -12,7 +12,10 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def evaluate(model, dataset):
     all_preds, all_labels = [], []
+    i = 0
     for speech, labels in dataset.get_speeches():
+        print(f"Evaluating model for speech {i}...")
+        i += 1
         speech["tokens"] = speech["tokens"].to(device)
         speech["pros_feat"] = speech["pros_feat"].to(device)
         labels = labels.to(device)
