@@ -8,10 +8,6 @@ from torch.utils.data import DataLoader
 from torch.nn.functional import binary_cross_entropy, one_hot
 from math import inf
 
-OUTPUT_MODEL, INPUT_MODEL = argv[1], None
-if len(argv) > 2:
-    INPUT_MODEL = argv[2]
-
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"Using device {device}")
 
@@ -27,7 +23,6 @@ def train(
         max_batches_per_epoch=inf
 ):
     train_loader = DataLoader(dataset, batch_size, shuffle=True)
-    epoch_losses = []
     for epoch in range(num_epochs):
         print(f"\tBeginning epoch {epoch}...")
         running_loss = 0.0
@@ -63,12 +58,6 @@ def train(
                 else:
                     print("Checkpoint reached. Not saving...")
 
-        epoch_losses.append(running_loss)
-        if running_loss == max(epoch_losses):
-            print("Saving model...")
-            torch.save(model, OUTPUT_MODEL)
-            print("Model saved.")
-
         if val_set:
             print("Validating...")
             p, r, f, p_combined, r_combined, f_combined = evaluate(model, val_set)
@@ -78,21 +67,26 @@ def train(
 
 
 if __name__ == "__main__":
+    OUTPUT_MODEL, INPUT_MODEL = argv[1], None
+    if len(argv) > 2:
+        INPUT_MODEL = argv[2]
+
     if INPUT_MODEL:
         model = torch.load(INPUT_MODEL, map_location=device)
     else:
         model = AutoPuncModel()
         model.to(device)
     train_set = AutoPuncDataset("../data/train")
-    pretrain_set = AutoPuncDataset("../data/iwslt")
+    #pretrain_set = AutoPuncDataset("../data/iwslt")
 
     print("Initializing optimizer...")
     radam = RAdam(model.parameters(), betas=(.9, .999), lr=1e-5, eps=1e-8)
     lookahead_optimizer = Lookahead(radam, k=6, alpha=0.5)
 
-    print("Pretraining model...")
-    train(model, pretrain_set, lookahead_optimizer, num_epochs=1, max_batches_per_epoch=1000)
-    torch.save(model, OUTPUT_MODEL.replace(".pt", "-pretrained.pt"))
+    #print("Pretraining model...")
+    #train(model, pretrain_set, lookahead_optimizer, num_epochs=1, max_batches_per_epoch=1000)
+    #torch.save(model, OUTPUT_MODEL.replace(".pt", "-pretrained.pt"))
 
     print("Training model...")
-    train(model, train_set, lookahead_optimizer)
+    train(model, train_set, lookahead_optimizer, num_epochs=10)
+    torch.save(model, OUTPUT_MODEL)
