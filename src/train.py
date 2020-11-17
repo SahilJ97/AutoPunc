@@ -47,6 +47,8 @@ def train(
                 print('[%d, %5d] loss: %.6f' %
                       (epoch + 1, i + 1, running_loss)
                 )
+                with open(LOG_FILE, "a+") as log:
+                    log.write(f"{epoch+1} {i+1} {running_loss}\n")
                 running_losses.append(running_loss)
                 running_loss = 0
 
@@ -68,6 +70,7 @@ def train(
 
 if __name__ == "__main__":
     OUTPUT_MODEL, INPUT_MODEL = argv[1], None
+    LOG_FILE = OUTPUT_MODEL.replace(".pt", ".log")
     if len(argv) > 2:
         INPUT_MODEL = argv[2]
 
