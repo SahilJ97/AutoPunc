@@ -5,6 +5,7 @@ from torch.nn.modules import Module
 from torch.nn import Linear, BatchNorm1d, Dropout, LSTM
 from torch.nn.functional import softmax, relu
 from .data import POSSIBLE_LABELS
+import sys
 
 
 class AutoPuncModel(Module, ABC):
@@ -80,7 +81,10 @@ class AutoPuncModel(Module, ABC):
         """Predict labels for a full speech using cross-context aggregation"""
         zero_tensor = torch.tensor([0. for label in POSSIBLE_LABELS])
         context_predictions = []
-        for i in range(len(speech_data["tokens"] - self.window_size + 1)):
+        num_windows = len(speech_data["tokens"]) - self.window_size + 1
+        for i in range(num_windows):
+            sys.stdout.write(f"Predicting punctuation for window {i} of {num_windows}...\r")
+            sys.stdout.flush()
             window = {
                 "tokens": torch.unsqueeze(speech_data["tokens"][i:i+self.window_size], dim=0),
                 "pros_feat": torch.unsqueeze(speech_data["pros_feat"][i:i + self.window_size], dim=0)
@@ -88,10 +92,10 @@ class AutoPuncModel(Module, ABC):
             context_predictions.append(self.forward(window)[0])
         aggregated_probs = context_predictions[0]
         for cp in context_predictions[1:]:
-            aggregated_probs.append(zero_tensor)
+            aggregated_probs = torch.cat((aggregated_probs, torch.unsqueeze(zero_tensor, dim=0)))
             for i, j in zip(
                     range(len(aggregated_probs)-self.window_size, len(aggregated_probs)),
                     range(self.window_size)
             ):
                 aggregated_probs[i] = aggregated_probs[i] + cp[j]
-        return torch.stack(aggregated_probs)
+        return aggregated_probs

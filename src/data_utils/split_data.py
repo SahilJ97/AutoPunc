@@ -24,4 +24,3 @@ if __name__ == "__main__":
         os.mkdir(new_dir)
         for f in dir_contents:
             os.symlink(f, f.replace(DATA_DIR, new_dir))  # populate the data subset directory with symlinks
-

@@ -8,7 +8,10 @@ from torch.utils.data import DataLoader
 from torch.nn.functional import binary_cross_entropy, one_hot
 from math import inf
 
-OUTPUT_FILE = argv[1]
+OUTPUT_MODEL, INPUT_MODEL = argv[1], None
+if len(argv) > 2:
+    INPUT_MODEL = argv[2]
+
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"Using device {device}")
 
@@ -20,7 +23,7 @@ def train(
         batch_size=32,
         num_epochs=5,
         loss_fn=binary_cross_entropy,
-        val_set=None,
+        val_set=None,  # validation is memory-expensive and therefore not recommended for most GPUs
         max_batches_per_epoch=inf
 ):
     train_loader = DataLoader(dataset, batch_size, shuffle=True)
@@ -28,6 +31,7 @@ def train(
     for epoch in range(num_epochs):
         print(f"\tBeginning epoch {epoch}...")
         running_loss = 0.0
+        running_losses = []
         for i, data in enumerate(train_loader, 0):
             if i >= max_batches_per_epoch:
                 break
@@ -45,19 +49,24 @@ def train(
             # Print cumulative batch loss every 10 mini-batches
             running_loss += loss.item()
             if i % 10 == 9:
-                print('[%d, %5d] loss: %.3f' %
-                      (epoch + 1, i + 1, running_loss / i+1)
+                print('[%d, %5d] loss: %.6f' %
+                      (epoch + 1, i + 1, running_loss)
                 )
+                running_losses.append(running_loss)
+                running_loss = 0
 
             # Checkpoint every 200 mini-batches
             if i % 200 == 199:
-                print("Model checkpoint--saving...")
-                torch.save(model, OUTPUT_FILE.replace(".pt", "-checkpoint.pt"))
+                if running_losses[-1] == max(running_losses):
+                    print("Checkpoint reached. Saving...")
+                    torch.save(model, OUTPUT_MODEL.replace(".pt", "-checkpoint.pt"))
+                else:
+                    print("Checkpoint reached. Not saving...")
 
         epoch_losses.append(running_loss)
         if running_loss == max(epoch_losses):
             print("Saving model...")
-            torch.save(model, OUTPUT_FILE)
+            torch.save(model, OUTPUT_MODEL)
             print("Model saved.")
 
         if val_set:
@@ -69,10 +78,12 @@ def train(
 
 
 if __name__ == "__main__":
-    model = AutoPuncModel()
-    model.to(device)
+    if INPUT_MODEL:
+        model = torch.load(INPUT_MODEL, map_location=device)
+    else:
+        model = AutoPuncModel()
+        model.to(device)
     train_set = AutoPuncDataset("../data/train")
-    dev_set = AutoPuncDataset("../data/dev")
     pretrain_set = AutoPuncDataset("../data/iwslt")
 
     print("Initializing optimizer...")
@@ -81,7 +92,7 @@ if __name__ == "__main__":
 
     print("Pretraining model...")
     train(model, pretrain_set, lookahead_optimizer, num_epochs=1, max_batches_per_epoch=1000)
-    torch.save(model, OUTPUT_FILE.replace(".pt", "-pretrained.pt"))
+    torch.save(model, OUTPUT_MODEL.replace(".pt", "-pretrained.pt"))
 
     print("Training model...")
-    train(model, train_set, lookahead_optimizer, val_set=dev_set)
+    train(model, train_set, lookahead_optimizer)
