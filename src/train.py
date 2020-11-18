@@ -86,5 +86,5 @@ if __name__ == "__main__":
     #torch.save(model, OUTPUT_MODEL.replace(".pt", "-pretrained.pt"))
 
     print("Training model...")
-    train(model, train_set, lookahead_optimizer, num_epochs=10)
+    train(model, train_set, lookahead_optimizer, num_epochs=3)
     torch.save(model, OUTPUT_MODEL)
