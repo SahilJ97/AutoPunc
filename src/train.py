@@ -26,7 +26,6 @@ def train(
     for epoch in range(num_epochs):
         print(f"\tBeginning epoch {epoch}...")
         running_loss = 0.0
-        running_losses = []
         for i, data in enumerate(train_loader, 0):
             if i >= max_batches_per_epoch:
                 break
@@ -49,16 +48,12 @@ def train(
                 )
                 with open(LOG_FILE, "a+") as log:
                     log.write(f"{epoch+1} {i+1} {running_loss}\n")
-                running_losses.append(running_loss)
                 running_loss = 0
 
             # Checkpoint every 200 mini-batches
             if i % 200 == 199:
-                if running_losses[-1] == max(running_losses):
-                    print("Checkpoint reached. Saving...")
-                    torch.save(model, OUTPUT_MODEL.replace(".pt", "-checkpoint.pt"))
-                else:
-                    print("Checkpoint reached. Not saving...")
+                print("Checkpoint reached. Saving...")
+                torch.save(model, OUTPUT_MODEL.replace(".pt", "-checkpoint.pt"))
 
         if val_set:
             print("Validating...")
