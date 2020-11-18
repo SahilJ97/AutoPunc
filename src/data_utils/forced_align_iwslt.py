@@ -25,7 +25,7 @@ if __name__ == "__main__":
         for speech_url, speech_xml in speeches:
             os.mkdir("tmp")
             html = requests.get(speech_url).text
-            video_url = re.findall(r'"medium":"(.+?)"', html)
+            video_url = re.findall(r'"medium":"(.+?)"', html)[0]
             wget.download(video_url, out="tmp/video.mp4")
             os.system(f"ffmpeg -i tmp/video.mp4 -ar 16000 {OUTPUT_DIR}/audio.wav")
             segments = re.findall(r"<seg id=\"[0-9]+\"> ([/S/s]+?)\s+</seg>", speech_xml)
