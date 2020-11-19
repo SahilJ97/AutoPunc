@@ -117,6 +117,7 @@ def get_punctuated_strings(
                 while speech_map[token_index][1] == speech_map[token_index+1][1]:
                     token_index += 1
                 pred = predictions[token_index].numpy().astype(float)
+                print(pred)
                 pred = np.argmax(pred)
                 punc = POSSIBLE_LABELS[pred]
                 if punc:
