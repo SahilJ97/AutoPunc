@@ -28,10 +28,12 @@ if __name__ == "__main__":
             with open("tmp/transcript.txt", "w") as transcript_file:
                 transcript_file.write(speech)
 
-            audio_file = glob.glob(f"{AUDIO_DIR}/*talkid{talk_id}.sph")
+            sph_file = f"{AUDIO_DIR}/*talkid{talk_id}.sph"
+            wav_file = sph_file.replace(".sph", ".wav")
+            os.system(f"ffmpeg - i {sph_file} {wav_file}")
 
             alignment_json = os.popen(
-                f'curl -F "audio=@{audio_file}" -F "transcript=@tmp/transcript.txt" '
+                f'curl -F "audio=@{wav_file}" -F "transcript=@tmp/transcript.txt" '
                 f'"http://{GENTLE_PORT}/transcriptions?async=false"'
             ).read()
             alignments = json.loads(alignment_json)
