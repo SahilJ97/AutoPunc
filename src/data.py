@@ -87,11 +87,12 @@ class AutoPuncDataset(Dataset):
             lines = speech_file.readlines()
             for word, line_n in speech[1][start:stop]:
                 tokens.append(word)
-                pros_seq = eval(
-                    lines[line_n].split("\t")[1]
-                )
+                pros_seq = []
                 if not self.ignore_prosodic:
-                    pros_feat.append(pros_seq)
+                    pros_seq = eval(
+                        lines[line_n].split("\t")[1]
+                    )
+                pros_feat.append(pros_seq)
         formatted_pros_feat = np.stack([self.pad_and_crop_seq(seq) for seq in pros_feat])
         return {
             "tokens": torch.tensor(tokens),
