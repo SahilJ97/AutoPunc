@@ -108,7 +108,7 @@ def get_punctuated_strings(
         predictions: List[torch.tensor]
 ):
     token_index = 0
-    for data_fname, speech_map in zip(dataset.data_files, dataset.data_map):
+    for data_fname, speech_map, speech_predictions in zip(dataset.data_files, dataset.data_map, predictions):
         print(data_fname)
         s = ""
         with open(data_fname, "r") as data_file:
@@ -116,7 +116,7 @@ def get_punctuated_strings(
                 s += line.split("\t")[0]
                 while speech_map[token_index][1] == speech_map[token_index+1][1]:
                     token_index += 1
-                pred = predictions[token_index].numpy().astype(float)
+                pred = speech_predictions[token_index].numpy().astype(float)
                 print(pred)
                 pred = np.argmax(pred)
                 punc = POSSIBLE_LABELS[pred]
