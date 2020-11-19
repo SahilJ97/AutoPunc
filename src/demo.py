@@ -8,9 +8,9 @@ if __name__ == "__main__":
     demo_set = data.AutoPuncDataset(data_dir)
 
     print("Without punctuation:")
-    for punctuated_string in data.get_punctuated_strings(demo_set, demo_set.raw_labels):
-        print(punctuated_string)
-        print()
+    unpunctuated_strings = data.get_punctuated_strings(demo_set, demo_set.raw_labels)
+    print(next(unpunctuated_strings))
+    print()
 
     model = torch.load("model.pt", map_location=device)
     predictions = []
