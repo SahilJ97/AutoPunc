@@ -16,13 +16,15 @@ class AutoPuncDataset(Dataset):
             max_prosodic_seq_length=175,  # mean in train set is 167.6
             window_size=100,
             pretrained="roberta-base",
-            n_pros_feat=4
+            n_pros_feat=4,
+            ignore_prosodic=False
     ):
         self.data_files = glob.glob(f"{data_dir}/*.data")
         self.window_size = window_size
         self.tokenizer = RobertaTokenizer.from_pretrained(pretrained)
         self.max_seq_len = max_prosodic_seq_length
         self.n_pros_feat = n_pros_feat
+        self.ignore_prosodic = ignore_prosodic
         self.data_map = []  # holds as list of (token, row_number) tuples for each speech
         self.raw_labels = []  # if data files are un-punctuated, labels will all be None
         print(f"Indexing data in {data_dir}...")
@@ -88,7 +90,8 @@ class AutoPuncDataset(Dataset):
                 pros_seq = eval(
                     lines[line_n].split("\t")[1]
                 )
-                pros_feat.append(pros_seq)
+                if not self.ignore_prosodic:
+                    pros_feat.append(pros_seq)
         formatted_pros_feat = np.stack([self.pad_and_crop_seq(seq) for seq in pros_feat])
         return {
             "tokens": torch.tensor(tokens),

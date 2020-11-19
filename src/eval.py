@@ -5,7 +5,7 @@ from sklearn.metrics import precision_recall_fscore_support
 from multiprocessing import cpu_count
 import numpy as np
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 def evaluate(model, dataset):
@@ -14,9 +14,9 @@ def evaluate(model, dataset):
     for speech, labels in dataset.get_speeches():
         print(f"Evaluating model for speech {i}...")
         i += 1
-        speech["tokens"] = speech["tokens"].to(device)
-        speech["pros_feat"] = speech["pros_feat"].to(device)
-        labels = labels.to(device)
+        speech["tokens"] = speech["tokens"].to(DEVICE)
+        speech["pros_feat"] = speech["pros_feat"].to(DEVICE)
+        labels = labels.to(DEVICE)
 
         all_preds.append(model.predict(speech))
         all_labels.append(labels)
@@ -33,11 +33,14 @@ def evaluate(model, dataset):
 
 if __name__ == "__main__":
     MODEL, TEST_DIR = argv[1], argv[2]
-    device = "cpu"  # Use all CPU cores for evaluation on the test set
+    IGNORE_PROSODIC = False
+    if "--ignore-prosodic" in argv:
+        IGNORE_PROSODIC = True
+    DEVICE = "cpu"  # Use all CPU cores for evaluation on the test set
     NUM_PROCESSES = cpu_count()
     # load model and test set
-    model = torch.load(MODEL, map_location=device)
-    test_set = AutoPuncDataset(TEST_DIR)
+    model = torch.load(MODEL, map_location=DEVICE)
+    test_set = AutoPuncDataset(TEST_DIR, ignore_prosodic=IGNORE_PROSODIC)
     print("Evaluating model...")
     with torch.no_grad():
         results = evaluate(model, test_set)
