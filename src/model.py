@@ -85,7 +85,7 @@ class AutoPuncModel(Module, ABC):
         context_predictions = []
         num_windows = len(speech_data["tokens"]) - self.window_size + 1
         for i in range(num_windows):
-            sys.stdout.write(f"Predicting punctuation for window {i} of {num_windows}...\r")
+            sys.stdout.write(f"Predicting punctuation for window {i+1} of {num_windows}...\r")
             sys.stdout.flush()
             window = {
                 "tokens": torch.unsqueeze(speech_data["tokens"][i:i + self.window_size], dim=0),

@@ -109,16 +109,17 @@ def get_punctuated_strings(
 ):
     token_index = 0
     for data_fname, speech_map, speech_predictions in zip(dataset.data_files, dataset.data_map, predictions):
-        print(data_fname)
         s = ""
         with open(data_fname, "r") as data_file:
             for line in data_file:
                 s += line.split("\t")[0]
-                while speech_map[token_index][1] == speech_map[token_index+1][1]:
+                while token_index < len(speech_map[1]) - 1 and \
+                        speech_map[1][token_index+1][1] == speech_map[1][token_index][1]:
                     token_index += 1
-                pred = speech_predictions[token_index].numpy().astype(float)
-                print(pred)
-                pred = np.argmax(pred)
+                pred = speech_predictions[token_index]
+                if not isinstance(pred, int):
+                    pred = pred.numpy().astype(float)
+                    pred = np.argmax(pred)
                 punc = POSSIBLE_LABELS[pred]
                 if punc:
                     s += punc
