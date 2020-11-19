@@ -26,7 +26,8 @@ def evaluate(model, dataset):
     all_preds = all_preds.numpy().astype(float)  # just changed from int after batch 1 evaluation...
     all_preds = np.argmax(all_preds, axis=-1)
     p, r, f, _ = precision_recall_fscore_support(all_labels, all_preds)
-    p_combined, r_combined, f_combined, _ = precision_recall_fscore_support(all_labels, all_preds, average="micro")
+    p_combined, r_combined, f_combined, _ = precision_recall_fscore_support(all_labels, all_preds, average="macro")
+    # all the same! should I be using macro???
     return p, r, f, p_combined, r_combined, f_combined
 
 
