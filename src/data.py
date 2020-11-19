@@ -109,6 +109,7 @@ def get_punctuated_strings(
 ):
     token_index = 0
     for data_fname, speech_map, speech_predictions in zip(dataset.data_files, dataset.data_map, predictions):
+        print("Punctuating ", data_fname)
         s = ""
         with open(data_fname, "r") as data_file:
             for line in data_file:
