@@ -13,7 +13,8 @@ if __name__ == "__main__":
         speech["tokens"] = speech["tokens"].to(device)
         speech["pros_feat"] = speech["pros_feat"].to(device)
 
-        predictions.append(model.predict(speech))
+        with torch.no_grad:
+            predictions.append(model.predict(speech))
 
     for punctuated_string in data.get_punctuated_strings(demo_set, predictions):
         print(punctuated_string)
