@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
             sph_file = f"{AUDIO_DIR}/*talkid{talk_id}.sph"
             wav_file = sph_file.replace(".sph", ".wav")
-            os.system(f"ffmpeg -i {sph_file} {wav_file}")
+            os.system(f"sox {sph_file} {wav_file}")
 
             alignment_json = os.popen(
                 f'curl -F "audio=@{wav_file}" -F "transcript=@tmp/transcript.txt" '
