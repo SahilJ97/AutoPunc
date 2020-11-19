@@ -6,6 +6,8 @@ from torch.nn import Linear, BatchNorm1d, Dropout, LSTM
 from torch.nn.functional import softmax, relu
 from .data import POSSIBLE_LABELS
 import sys
+import queue
+import torch.multiprocessing as mp
 
 
 class AutoPuncModel(Module, ABC):
@@ -77,19 +79,39 @@ class AutoPuncModel(Module, ABC):
         probs = softmax(self.final_layer(normalized), dim=-1)
         return probs
 
-    def predict(self, speech_data):
+    def predict(self, speech_data, n_threads=1):
         """Predict labels for a full speech using cross-context aggregation"""
         zero_tensor = torch.tensor([0. for label in POSSIBLE_LABELS])
         context_predictions = []
         num_windows = len(speech_data["tokens"]) - self.window_size + 1
+        context_predictions = [None for i in range(num_windows)]
+        task_queue = queue.Queue()
         for i in range(num_windows):
-            sys.stdout.write(f"Predicting punctuation for window {i} of {num_windows}...\r")
-            sys.stdout.flush()
-            window = {
-                "tokens": torch.unsqueeze(speech_data["tokens"][i:i+self.window_size], dim=0),
-                "pros_feat": torch.unsqueeze(speech_data["pros_feat"][i:i + self.window_size], dim=0)
-            }
-            context_predictions.append(self.forward(window)[0])
+            task_queue.put(i)
+
+        def predict_window():
+            while True:
+                try:
+                    i = task_queue.get()
+                except queue.Empty:
+                    return
+                window = {
+                    "tokens": torch.unsqueeze(speech_data["tokens"][i:i + self.window_size], dim=0),
+                    "pros_feat": torch.unsqueeze(speech_data["pros_feat"][i:i + self.window_size], dim=0)
+                }
+                context_predictions[i] = self.forward(window)[0]
+
+        # Parallelized prediction
+        self.share_memory()
+        processes = []
+        for rank in range(n_threads):
+            p = mp.Process(target=predict_window, args=())
+            p.start()
+            processes.append(p)
+        for p in processes:
+            p.join()
+
+        # Cross-context aggregation
         aggregated_probs = context_predictions[0]
         print("")
         for cp in context_predictions[1:]:
