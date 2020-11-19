@@ -91,6 +91,7 @@ class AutoPuncModel(Module, ABC):
             }
             context_predictions.append(self.forward(window)[0])
         aggregated_probs = context_predictions[0]
+        print("")
         for cp in context_predictions[1:]:
             aggregated_probs = torch.cat((aggregated_probs, torch.unsqueeze(zero_tensor, dim=0)))
             for i, j in zip(

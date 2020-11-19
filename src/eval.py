@@ -1,9 +1,7 @@
 from src.data import AutoPuncDataset, POSSIBLE_LABELS
 from sys import argv
 import torch
-from torch.nn.functional import one_hot
 from sklearn.metrics import precision_recall_fscore_support
-import torch.multiprocessing as mp
 from multiprocessing import cpu_count
 import numpy as np
 
@@ -25,7 +23,7 @@ def evaluate(model, dataset):
     all_preds = torch.cat(all_preds, dim=0)
     all_labels = torch.cat(all_labels, dim=0)
     all_labels = all_labels.numpy().astype(int)
-    all_preds = all_preds.numpy().astype(int)
+    all_preds = all_preds.numpy().astype(float)  # just changed from int after batch 1 evaluation...
     all_preds = np.argmax(all_preds, axis=-1)
     p, r, f, _ = precision_recall_fscore_support(all_labels, all_preds)
     p_combined, r_combined, f_combined, _ = precision_recall_fscore_support(all_labels, all_preds, average="micro")
@@ -42,13 +40,6 @@ if __name__ == "__main__":
     print("Evaluating model...")
     with torch.no_grad():
         results = evaluate(model, test_set)
-    print("Results: ", results)
-
-    model.share_memory()
-    processes = []
-    for rank in range(NUM_PROCESSES):  # fix: screenshotted error.
-        p = mp.Process(target=evaluate, args=(model, test_set))
-        p.start()
-        processes.append(p)
-    for p in processes:
-        p.join()
+    print(results)
+    p, r, f, p_combined, r_combined, f_combined = results
+    print("p, r, f, p_combined, r_combined, f_combined: ", p, r, f, p_combined, r_combined, f_combined)

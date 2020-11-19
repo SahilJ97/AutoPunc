@@ -4,6 +4,7 @@ from torch.utils.data import Dataset
 from csv import reader
 import glob
 import numpy as np
+from typing import List
 
 POSSIBLE_LABELS = ['.', ',', '?', None]
 
@@ -17,20 +18,20 @@ class AutoPuncDataset(Dataset):
             pretrained="roberta-base",
             n_pros_feat=4
     ):
-        self.csv_files = glob.glob(f"{data_dir}/*.data")
+        self.data_files = glob.glob(f"{data_dir}/*.data")
         self.window_size = window_size
         self.tokenizer = RobertaTokenizer.from_pretrained(pretrained)
         self.max_seq_len = max_prosodic_seq_length
         self.n_pros_feat = n_pros_feat
-        self.data_map = []  # holds as list of (word, row_number) tuples for each speech
-        self.raw_labels = []
+        self.data_map = []  # holds as list of (token, row_number) tuples for each speech
+        self.raw_labels = []  # if data files are un-punctuated, labels will all be None
         print(f"Indexing data in {data_dir}...")
         self.index_data()
 
     def index_data(self):
-        for csv_file in self.csv_files:
-            self.data_map.append((csv_file, []))
-            with open(csv_file, "r") as f:
+        for data_file in self.data_files:
+            self.data_map.append((data_file, []))
+            with open(data_file, "r") as f:
                 rows = reader(f, delimiter="\t")
                 labels = []
                 row_number = 0
@@ -100,3 +101,25 @@ class AutoPuncDataset(Dataset):
                 self.get_input_window(speech, 0, len(speech[1])),
                 torch.tensor(labels)
             )
+
+
+def get_punctuated_strings(
+        dataset: AutoPuncDataset,  # punctuation-free dataset
+        predictions: List[torch.tensor]
+):
+    token_index = 0
+    for data_fname, speech_map in zip(dataset.data_files, dataset.data_map):
+        s = ""
+        with open(data_fname, "r") as data_file:
+            for line in data_file:
+                s += line.split("\t")[0]
+                while speech_map[token_index][1] == speech_map[token_index+1][1]:
+                    token_index += 1
+                pred = predictions[token_index].numpy().astype(float)
+                pred = np.argmax(pred)
+                punc = POSSIBLE_LABELS[pred]
+                if punc:
+                    s += punc
+                s += " "
+                token_index += 1
+        yield s
