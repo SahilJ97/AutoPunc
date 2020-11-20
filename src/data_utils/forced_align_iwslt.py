@@ -25,6 +25,7 @@ if __name__ == "__main__":
             xml
         )
         for talk_id, speech_xml in speeches:
+            shutil.rmtree("tmp")
             os.mkdir("tmp")
             segments = re.findall(r"<seg id=\"[0-9]+\"> ([\S\s]+?)\s+?</seg>", speech_xml)
             speech = " ".join(segments)
