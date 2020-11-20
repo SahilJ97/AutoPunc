@@ -23,7 +23,7 @@ if __name__ == "__main__":
         )
         for talk_id, speech_xml in speeches:
             os.mkdir("tmp")
-            segments = re.findall(r"<seg id=\"[0-9]+\"> ([/S/s]+?)\s+</seg>", speech_xml)
+            segments = re.findall(r"<seg id=\"[0-9]+\"> ([\S\s]+?)\s+?</seg>", speech_xml)
             speech = " ".join(segments)
             print(speech)
             with open("tmp/transcript.txt", "w") as transcript_file:
