@@ -58,5 +58,5 @@ if __name__ == "__main__":
                             )
                         )
                     except KeyError:
-                        print(f"ERROR: Failed to find alignment for word {word['word']}")
+                        print(f"Failed to find alignment for word {word['word']}")
             os.system(f"rm -f tmp.transcript tmp.align")

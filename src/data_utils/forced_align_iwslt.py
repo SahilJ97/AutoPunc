@@ -1,3 +1,8 @@
+"""
+Usage:
+$ sudo python3 forced_align_iwslt.py INPUT_XML AUDIO_DIR OUTPUT_DIR
+"""
+
 import re
 import os
 import shutil
@@ -25,6 +30,8 @@ if __name__ == "__main__":
             xml
         )
         for talk_id, speech_xml in speeches:
+
+            # Write speech transcript
             if os.path.exists("tmp"):
                 shutil.rmtree("tmp")
             os.mkdir("tmp")
@@ -33,19 +40,23 @@ if __name__ == "__main__":
             with open("tmp/transcript.txt", "w") as transcript_file:
                 transcript_file.write(speech)
 
+            # Convert audio to .wav
             sph_file = glob.glob(f"{AUDIO_DIR}/*talkid{talk_id}.sph")[0]
             wav_file = sph_file.replace(".sph", ".wav")
             os.system(f"sph2pipe {sph_file} {wav_file}")
 
+            # Perform forced alignment
             alignment_json = os.popen(
                 f'curl -F "audio=@{wav_file}" -F "transcript=@tmp/transcript.txt" '
                 f'"http://{GENTLE_PORT}/transcriptions?async=false"'
             ).read()
             alignments = json.loads(alignment_json)
             words = alignments["words"]
+
+            # Write SCP file
             for i in range(len(words)):
                 word = words[i]
-                with open(f"{OUTPUT_DIR}/wav.scp", "a+") as out_scp:
+                with open(f"{OUTPUT_DIR}/{talk_id}-wav.scp", "a+") as out_scp:
                     try:
                         out_scp.write(
                             format_scp_entry(
@@ -53,5 +64,11 @@ if __name__ == "__main__":
                             )
                         )
                     except KeyError:
-                        print(f"ERROR: Failed to find alignment for word {word['word']}")
+                        print(f"Failed to find alignment for word {word['word']}")
+
+            # Generate datafile from SCP
+            os.system(
+                f"bash scp_to_data.sh {OUTPUT_DIR}/{talk_id}-wav.scp tmp/transcript.txt {OUTPUT_DIR}/{talk_id}.data"
+            )
+
             shutil.rmtree("tmp")

@@ -46,7 +46,7 @@ for speaker_dir in "$common_base"/WAVE/*; do
         --config=confs/mfcc.conf scp:"$wav_scp_file" ark,scp:energy.ark,energy.scp
 
       echo "Generating formatted data file..."
-      KALDI_ROOT=$PATH_TO_KALDI python3 format_session_data.py \
+      KALDI_ROOT=$PATH_TO_KALDI python3 format_nsc_session_data.py \
         "$speaker_session_transcript" energy.scp pitch.scp "$OUTPUT_DIR"/2-"$speaker_session".data
     fi
 
