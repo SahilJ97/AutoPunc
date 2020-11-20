@@ -1,12 +1,14 @@
 import torch
 from transformers import RobertaTokenizer
 from torch.utils.data import Dataset
-from csv import reader
+import csv
 import glob
 import numpy as np
 from typing import List
+import sys
 
 POSSIBLE_LABELS = ['.', ',', '?', None]
+csv.field_size_limit(sys.maxsize)
 
 
 class AutoPuncDataset(Dataset):
@@ -34,7 +36,7 @@ class AutoPuncDataset(Dataset):
         for data_file in self.data_files:
             self.data_map.append((data_file, []))
             with open(data_file, "r") as f:
-                rows = reader(f, delimiter="\t")
+                rows = csv.reader(f, delimiter="\t")
                 labels = []
                 row_number = 0
                 for row in rows:

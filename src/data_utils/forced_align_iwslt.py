@@ -54,9 +54,9 @@ if __name__ == "__main__":
             words = alignments["words"]
 
             # Write SCP file
-            for i in range(len(words)):
-                word = words[i]
-                with open(f"{OUTPUT_DIR}/{talk_id}-wav.scp", "a+") as out_scp:
+            with open(f"{OUTPUT_DIR}/{talk_id}-wav.scp", "w+") as out_scp:
+                for i in range(len(words)):
+                    word = words[i]
                     try:
                         out_scp.write(
                             format_scp_entry(
