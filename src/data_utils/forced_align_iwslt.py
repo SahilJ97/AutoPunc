@@ -1,6 +1,6 @@
 """
 Usage:
-$ sudo python3 forced_align_iwslt.py INPUT_XML AUDIO_DIR OUTPUT_DIR
+$ python3 forced_align_iwslt.py INPUT_XML AUDIO_DIR OUTPUT_DIR
 """
 
 import re
@@ -60,7 +60,7 @@ if __name__ == "__main__":
                     try:
                         out_scp.write(
                             format_scp_entry(
-                                i, word["word"], word["start"], word["end"], f"{OUTPUT_DIR}/audio.wav"
+                                i, word["word"], word["start"], word["end"], wav_file
                             )
                         )
                     except KeyError:
