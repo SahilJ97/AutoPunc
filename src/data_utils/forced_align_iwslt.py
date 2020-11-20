@@ -25,6 +25,7 @@ if __name__ == "__main__":
             os.mkdir("tmp")
             segments = re.findall(r"<seg id=\"[0-9]+\"> ([/S/s]+?)\s+</seg>", speech_xml)
             speech = " ".join(segments)
+            print(speech)
             with open("tmp/transcript.txt", "w") as transcript_file:
                 transcript_file.write(speech)
 
