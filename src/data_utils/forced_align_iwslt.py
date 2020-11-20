@@ -30,6 +30,10 @@ if __name__ == "__main__":
             sph_file = f"{AUDIO_DIR}/*talkid{talk_id}.sph"
             wav_file = sph_file.replace(".sph", ".wav")
             os.system(f"sph2pipe {sph_file} {wav_file}")
+            print(
+                f'curl -F "audio=@{wav_file}" -F "transcript=@tmp/transcript.txt" '
+                f'"http://{GENTLE_PORT}/transcriptions?async=false"'
+            )
 
             alignment_json = os.popen(
                 f'curl -F "audio=@{wav_file}" -F "transcript=@tmp/transcript.txt" '
