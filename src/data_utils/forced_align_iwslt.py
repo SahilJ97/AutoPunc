@@ -3,6 +3,7 @@ import os
 import shutil
 from sys import argv
 import json
+import glob
 
 GENTLE_PORT = "0.0.0.0:32768"  # May need to change. run 'docker ps' to find where Gentle image is listening
 INPUT_XML, AUDIO_DIR, OUTPUT_DIR = argv[1], argv[2], argv[3]
@@ -27,7 +28,7 @@ if __name__ == "__main__":
             with open("tmp/transcript.txt", "w") as transcript_file:
                 transcript_file.write(speech)
 
-            sph_file = f"{AUDIO_DIR}/*talkid{talk_id}.sph"
+            sph_file = glob.glob(f"{AUDIO_DIR}/*talkid{talk_id}.sph")[0]
             wav_file = sph_file.replace(".sph", ".wav")
             os.system(f"sph2pipe {sph_file} {wav_file}")
             print(
