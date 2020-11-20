@@ -29,6 +29,7 @@ if __name__ == "__main__":
                 transcript_file.write(speech)
 
             sph_file = glob.glob(f"{AUDIO_DIR}/*talkid{talk_id}.sph")[0]
+            print(sph_file)
             wav_file = sph_file.replace(".sph", ".wav")
             os.system(f"sph2pipe {sph_file} {wav_file}")
             print(
