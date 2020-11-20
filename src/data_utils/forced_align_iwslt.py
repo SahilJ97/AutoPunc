@@ -15,6 +15,9 @@ def format_scp_entry(word_index, word, start, end, audio_fname):
 
 
 if __name__ == "__main__":
+    if not os.path.exists(OUTPUT_DIR):
+        os.mkdir(OUTPUT_DIR)
+
     with open(INPUT_XML, "r") as xml_file:
         xml = xml_file.read()
         speeches = re.findall(
@@ -25,18 +28,12 @@ if __name__ == "__main__":
             os.mkdir("tmp")
             segments = re.findall(r"<seg id=\"[0-9]+\"> ([\S\s]+?)\s+?</seg>", speech_xml)
             speech = " ".join(segments)
-            print(speech)
             with open("tmp/transcript.txt", "w") as transcript_file:
                 transcript_file.write(speech)
 
             sph_file = glob.glob(f"{AUDIO_DIR}/*talkid{talk_id}.sph")[0]
-            print(sph_file)
             wav_file = sph_file.replace(".sph", ".wav")
             os.system(f"sph2pipe {sph_file} {wav_file}")
-            print(
-                f'curl -F "audio=@{wav_file}" -F "transcript=@tmp/transcript.txt" '
-                f'"http://{GENTLE_PORT}/transcriptions?async=false"'
-            )
 
             alignment_json = os.popen(
                 f'curl -F "audio=@{wav_file}" -F "transcript=@tmp/transcript.txt" '
@@ -46,7 +43,6 @@ if __name__ == "__main__":
             words = alignments["words"]
             for i in range(len(words)):
                 word = words[i]
-                print(word["word"])
                 with open(f"{OUTPUT_DIR}/wav.scp", "a+") as out_scp:
                     try:
                         out_scp.write(
