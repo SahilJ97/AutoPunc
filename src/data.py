@@ -1,14 +1,11 @@
 import torch
 from transformers import RobertaTokenizer
 from torch.utils.data import Dataset
-import csv
 import glob
 import numpy as np
 from typing import List
-import sys
 
 POSSIBLE_LABELS = ['.', ',', '?', None]
-csv.field_size_limit(sys.maxsize)
 
 
 class AutoPuncDataset(Dataset):
@@ -29,17 +26,17 @@ class AutoPuncDataset(Dataset):
         self.ignore_prosodic = ignore_prosodic
         self.data_map = []  # holds as list of (token, row_number) tuples for each speech
         self.raw_labels = []  # if data files are un-punctuated, labels will all be None
-        print(f"Indexing data in {data_dir}...")
         self.index_data()
 
     def index_data(self):
         for data_file in self.data_files:
+            print(f"Indexing {data_file}")
             self.data_map.append((data_file, []))
             with open(data_file, "r") as f:
-                rows = csv.reader(f, delimiter="\t")
                 labels = []
                 row_number = 0
-                for row in rows:
+                for row in f:
+                    row = row.replace('"', '').replace("'", "").split("\t")
                     word = row[0].lower()
                     punc = None
                     if word[-1] in POSSIBLE_LABELS:
@@ -47,6 +44,7 @@ class AutoPuncDataset(Dataset):
                             punc = word[-1]
                             word = word[:-1]
                     new_tokens = self.tokenizer(word)['input_ids'][1:-1]
+                    print(word, new_tokens)
                     for token in new_tokens:
                         labels.append(POSSIBLE_LABELS.index(None))
                         self.data_map[-1][1].append((token, row_number))

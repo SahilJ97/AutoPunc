@@ -39,8 +39,8 @@ if __name__ == "__main__":
     DEVICE = "cpu"  # Use all CPU cores for evaluation on the test set
     NUM_PROCESSES = cpu_count()
     # load model and test set
-    model = torch.load(MODEL, map_location=DEVICE)
     test_set = AutoPuncDataset(TEST_DIR, ignore_prosodic=IGNORE_PROSODIC)
+    model = torch.load(MODEL, map_location=DEVICE)
     print("Evaluating model...")
     with torch.no_grad():
         results = evaluate(model, test_set)
