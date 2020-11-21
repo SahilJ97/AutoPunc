@@ -39,6 +39,8 @@ class AutoPuncDataset(Dataset):
                     row = row.replace('"', '').replace("'", "").split("\t")
                     word = row[0].lower()
                     punc = None
+                    if word == "":
+                        continue
                     if word[-1] in POSSIBLE_LABELS:
                         if len(word) <= 1 or word[-2] != '.':  # don't add '.' label if word ends with ellipsis
                             punc = word[-1]
