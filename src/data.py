@@ -44,7 +44,6 @@ class AutoPuncDataset(Dataset):
                             punc = word[-1]
                             word = word[:-1]
                     new_tokens = self.tokenizer(word)['input_ids'][1:-1]
-                    print(word, new_tokens)
                     for token in new_tokens:
                         labels.append(POSSIBLE_LABELS.index(None))
                         self.data_map[-1][1].append((token, row_number))
