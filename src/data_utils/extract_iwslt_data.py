@@ -1,6 +1,6 @@
 """
 Usage:
-$ python3 forced_align_iwslt.py INPUT_XML AUDIO_DIR OUTPUT_DIR
+$ python3 extract_iwslt_data.py INPUT_XML AUDIO_DIR OUTPUT_DIR
 """
 
 import re
@@ -9,6 +9,7 @@ import shutil
 from sys import argv
 import json
 import glob
+import subprocess
 
 GENTLE_PORT = "0.0.0.0:32768"  # May need to change. run 'docker ps' to find where Gentle image is listening
 INPUT_XML, AUDIO_DIR, OUTPUT_DIR = argv[1], argv[2], argv[3]
@@ -43,7 +44,7 @@ if __name__ == "__main__":
             # Convert audio to .wav
             sph_file = glob.glob(f"{AUDIO_DIR}/*talkid{talk_id}.sph")[0]
             wav_file = sph_file.replace(".sph", ".wav")
-            os.system(f"sph2pipe {sph_file} {wav_file}")
+            subprocess.run(f"sph2pipe {sph_file} {wav_file}", shell=True)
 
             # Perform forced alignment
             alignment_json = os.popen(
