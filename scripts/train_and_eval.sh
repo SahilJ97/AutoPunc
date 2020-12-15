@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Written by Sahil Jayaram (saj2163) for COMS 6998 (Topics in Computer Science): Fundamentals of Speech Recognition
+
+
 cd ../src || exit 1
 
 # Train model on NSC data and tune it on IWSLT data, generating model-untuned.pt and model-tuned.pt

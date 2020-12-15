@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Written by Sahil Jayaram (saj2163) for COMS 6998 (Topics in Computer Science): Fundamentals of Speech Recognition
+
 # Start the Gentle forced aligner as a background process
 docker run -P lowerquality/gentle &
 sleep 10

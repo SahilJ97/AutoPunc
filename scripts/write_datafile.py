@@ -1,3 +1,6 @@
+# Written by Sahil Jayaram (saj2163) for COMS 6998 (Topics in Computer Science): Fundamentals of Speech Recognition
+
+
 import kaldi_io
 from sys import argv
 from scipy.signal import resample

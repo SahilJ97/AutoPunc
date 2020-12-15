@@ -3,6 +3,8 @@ Usage:
 $ python3 extract_iwslt_test.py INPUT_XML AUDIO_DIR OUTPUT_DIR
 """
 
+# Written by Sahil Jayaram (saj2163) for COMS 6998 (Topics in Computer Science): Fundamentals of Speech Recognition
+
 import re
 import os
 import shutil

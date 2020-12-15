@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Written by Sahil Jayaram (saj2163) for COMS 6998 (Topics in Computer Science): Fundamentals of Speech Recognition
+#
 # Running the script: sudo bash extract_nsc_data.sh <corpus_dir> <output_dir>
 # IMPORTANT: Make sure the Gentle Docker container is running! Open a separate screen and run
 # $ sudo docker run -P lowerquality/gentle

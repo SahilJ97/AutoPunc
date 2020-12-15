@@ -1,3 +1,6 @@
+# Written by Sahil Jayaram (saj2163) for COMS 6998 (Topics in Computer Science): Fundamentals of Speech Recognition
+
+
 import torch
 from transformers import RobertaTokenizer
 from torch.utils.data import Dataset
@@ -109,9 +112,14 @@ class AutoPuncDataset(Dataset):
 
 
 def get_punctuated_strings(
-        dataset: AutoPuncDataset,  # punctuation-free dataset
+        dataset: AutoPuncDataset,
         predictions: List[torch.tensor]
 ):
+    """
+    param dataset: a punctuation-free dataset
+    param predictions: predictions for dataset, which will be applied to the unpunctuated text
+    returns: an iterable of punctuated strings (one for each data file)
+    """
     for data_fname, speech_map, speech_predictions in zip(dataset.data_files, dataset.data_map, predictions):
         s = ""
         with open(data_fname, "r") as data_file:

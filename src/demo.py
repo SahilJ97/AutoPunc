@@ -1,5 +1,8 @@
 from src import data
 import torch
+# Written by Sahil Jayaram (saj2163) for COMS 6998 (Topics in Computer Science): Fundamentals of Speech Recognition
+
+
 import sys
 
 if __name__ == "__main__":

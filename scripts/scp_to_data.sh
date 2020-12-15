@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Written by Sahil Jayaram (saj2163) for COMS 6998 (Topics in Computer Science): Fundamentals of Speech Recognition
+
+
 SCP_FILE=$1
 TRANSCRIPT=$2
 OUTPUT_FILE=$3

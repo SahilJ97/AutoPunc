@@ -1,3 +1,6 @@
+# Written by Sahil Jayaram (saj2163) for COMS 6998 (Topics in Computer Science): Fundamentals of Speech Recognition
+
+
 from src.data import AutoPuncDataset, POSSIBLE_LABELS
 from sys import argv
 import torch

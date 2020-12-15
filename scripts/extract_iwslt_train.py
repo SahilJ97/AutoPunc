@@ -1,5 +1,6 @@
+# Written by Sahil Jayaram (saj2163) for COMS 6998 (Topics in Computer Science): Fundamentals of Speech Recognition
+#
 # Script for preparing a pretraining datafile from a file provided for IWSLT12. The file is not paired with audio.
-# Note that train.data is not used in the training pipeline for this project.
 
 if __name__ == "__main__":
     with open("../data/iwslt/IWSLT12.TALK.train.en", "r") as in_file:
