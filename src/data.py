@@ -113,7 +113,6 @@ def get_punctuated_strings(
         predictions: List[torch.tensor]
 ):
     for data_fname, speech_map, speech_predictions in zip(dataset.data_files, dataset.data_map, predictions):
-        print("Punctuating ", data_fname)
         s = ""
         with open(data_fname, "r") as data_file:
             token_index = 0

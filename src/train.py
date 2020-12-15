@@ -74,17 +74,17 @@ if __name__ == "__main__":
     else:
         model = AutoPuncModel()
         model.to(device)
-    #train_set = AutoPuncDataset("../data/train")
+    train_set = AutoPuncDataset("../data/nsc/train")
+    tune_set = AutoPuncDataset("../data/iwslt")
 
     print("Initializing optimizer...")
     radam = RAdam(model.parameters(), betas=(.9, .999), lr=1e-5, eps=1e-8)
     lookahead_optimizer = Lookahead(radam, k=6, alpha=0.5)
 
-    #print("Training model...")
-    #train(model, train_set, lookahead_optimizer, num_epochs=2)
+    print("Training model...")
+    train(model, train_set, lookahead_optimizer, num_epochs=3)
+    torch.save(model, OUTPUT_MODEL.replace(".pt", "-untuned.pt"))
 
-    posttrain_set = AutoPuncDataset("../data/iwslt")
     print("Tuning model on IWSLT data (no acoustic features)...")
-    train(model, posttrain_set, lookahead_optimizer, num_epochs=1)
-
-    torch.save(model, OUTPUT_MODEL)
+    train(model, tune_set, lookahead_optimizer, num_epochs=1, max_batches_per_epoch=35530)
+    torch.save(model, OUTPUT_MODEL.replace(".pt", "-tuned.pt"))

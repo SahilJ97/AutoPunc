@@ -1,5 +1,6 @@
 from src import data
 import torch
+import sys
 
 if __name__ == "__main__":
     device = "cpu"
@@ -9,10 +10,11 @@ if __name__ == "__main__":
 
     print("Without punctuation:")
     unpunctuated_strings = data.get_punctuated_strings(demo_set, demo_set.raw_labels)
-    print(next(unpunctuated_strings))
+    for unpunc in unpunctuated_strings:
+        print(unpunc)
     print()
 
-    model = torch.load("model.pt", map_location=device)
+    model = torch.load(sys.argv[1], map_location=device)
     predictions = []
     for speech, _ in demo_set.get_speeches():
         speech["tokens"] = speech["tokens"].to(device)
