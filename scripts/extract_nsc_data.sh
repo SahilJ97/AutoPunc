@@ -14,7 +14,7 @@ OUTPUT_DIR=$2  # where TSV data files will be placed
 
 NUM_FILES=31  # number of data files to generate
 PATH_TO_KALDI=/home/saj2163/kaldi-trunk  # change according to installation location
-pip3 install -r ../../requirements.txt
+pip3 install -r ../requirements.txt
 
 common_base="$CORPUS_DIR"/PART2/DATA/CHANNEL0
 # Data organization in corpus (relative to common_base):
