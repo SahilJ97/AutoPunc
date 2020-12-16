@@ -17,4 +17,8 @@ python3 ../src/eval.py model-untuned.pt ../data/iwslt/tst2012_audio
 python3 ../src/eval.py model-tuned.pt ../data/iwslt/tst2012_audio
 python3 ../src/eval.py model-tuned.pt ../data/iwslt/tst2012_audio --ignore-prosodic
 
+# Demonstrate end-to-end system
+python3 ../src/demo.py model-untuned.pt
+python3 ../src/demo.py model-tuned.pt
+
 cd ../scripts || exit 1

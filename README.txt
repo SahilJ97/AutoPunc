@@ -34,13 +34,14 @@ Do not manually start the Gentle Docker image, as the script data_prep.sh will h
 -----PROJECT STRUCTURE-----
 
 PROJECT ROOT/
---scripts/          - contains all the code used to preprocess the data (fully executed by data_prep.sh) as well as the second main script, train_and_eval.sh
---data/
-----demo/           - contains data used to demonstrate the functionality of the APR system
-----iwslt/          - contains the raw IWSLT data (IWSLT12.TALK.train, en-fr-test/, tst2012_audio/*.sph) as well as the processed IWSLT data (train.data, tst2012_audio/*.data)
-----nsc/            - contains all the processed NSC data (all_data/*.data) and symlinks to these files in the directories dev, test, and train
---src/              - contains all the Python code concerning the PyTorch model
---requirements.txt  - Python environment requirements (see above)
+-scripts/ contains all the code used to preprocess the data (fully executed by data_prep.sh) as well as the second main script, train_and_eval.sh
+-data/
+----demo/ contains data used to demonstrate the functionality of the APR system
+----iwslt/ contains the raw IWSLT data (IWSLT12.TALK.train, en-fr-test/, tst2012_audio/*.sph) as well as the processed IWSLT data (train.data, tst2012_audio/*.data)
+----nsc/ contains all the processed NSC data (all_data/*.data) and symlinks to these files in the directories dev, test, and train
+-src/ contains all the Python code concerning the PyTorch model
+-requirements.txt - Python environment requirements (see above)
+-saj2163_final_paper.pdf - Project writeup
 
 
 -----RUNNING THE SCRIPTS-----
@@ -55,4 +56,4 @@ Next, run
 
 $ ./train_and_eval.sh > train_and_eval.log
 
-This script produces 2 trained models: model-untuned.pt (trained only on NSC data) and model-tuned.pt (fine-tuned on IWSLT text-only data). It also evaluates those models in various settings. After the process finishes running, train_and_eval.log will contain the entire training log and all evaluation results.
+This script produces 2 trained models: model-untuned.pt (trained only on NSC data) and model-tuned.pt (fine-tuned on IWSLT text-only data). It also evaluates those models in various settings. After the process finishes running, train_and_eval.log will contain the entire training log and all evaluation results. It will also contain demos of the end-to-end system (strings punctuated by the model) for both the tuned and untuned models.
