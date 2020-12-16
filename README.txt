@@ -26,7 +26,7 @@ For instructions on downloading and installing sph2pipe, see https://github.com/
 
 For instructions on downloading and installing Gentle, see https://github.com/lowerquality/gentle .
 
-The above link provides instructions for running the Gentle Docker image. For instructions on downloading and installing Docker, see https://docs.docker.com/get-docker/
+This project uses Gentle by running the Docker image. For instructions on downloading and installing Docker, see https://docs.docker.com/get-docker/
 
 Do not manually start the Gentle Docker image, as the script data_prep.sh will handle that.
 
@@ -42,6 +42,9 @@ PROJECT ROOT/
 -src/ contains all the Python code concerning the PyTorch model
 -requirements.txt - Python environment requirements (see above)
 -saj2163_final_paper.pdf - Project writeup
+-model-tuned.pt - Tuned model
+
+All files outside of data/ were written by me.
 
 
 -----RUNNING THE SCRIPTS-----
