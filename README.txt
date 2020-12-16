@@ -3,16 +3,18 @@ Sahil Jayaram (UNI saj2163)
 
 Automatic Punctuation Restoration Using Language Models and Prosodic Features
 
-Abstract of paper: High-performing automatic speech recognition (ASR) systems can transcribe speech with impressive accuracy, in some cases
-achieving lower word error rates than human scribes on benchmark corpora. Few of these systems, however, are capable of
-producing output that contains punctuation, which has been shown to significantly increase the readability of
-transcribed speech. State-of-the-art approaches to automatic punctuation restoration rely solely on text input,
-ignoring the wealth of task-relevant information latent in the original audio. In this paper, I present a solution for
-punctuation restoration that is based on a top-performing, transformer-based method, differing from its precursor in
-that it can optionally utilize prosodic features in addition to text. My model achieved a combined F1 of 84.5 on the
-IWSLT 2012 TED Talk evaluation set, outperforming the current state-of-the-art model by 0.6. Furthermore, my model
-consistently achieved its best performance when given prosodic features, demonstrating that prosody is a valuable
+Abstract of paper: High-performing automatic speech recognition (ASR) systems can transcribe speech with impressive
+accuracy, in some cases achieving lower word error rates than human scribes on benchmark corpora. Few of these systems,
+however, are capable of producing output that contains punctuation, which has been shown to significantly increase the
+readability of transcribed speech. State-of-the-art approaches to automatic punctuation restoration rely solely on text
+input, ignoring the wealth of task-relevant information latent in the original audio. In this paper, I present a
+solution for punctuation restoration that is based on a top-performing, transformer-based method, differing from its
+precursor in that it can optionally utilize prosodic features in addition to text. My model achieved a combined F1 of
+84.5 on the IWSLT 2012 TED Talk evaluation set, outperforming the current state-of-the-art model by 0.6. Furthermore, my
+model consistently achieved its best performance when given prosodic features, demonstrating that prosody is a valuable
 predictor of punctuation placement and is not rendered superfluous by text input.
+
+See saj2163_final_paper.pdf to read the full report.
 
 -----DATA-----
 
@@ -63,6 +65,13 @@ Enter the scripts directory. Then run
 
 $ sudo ./data_prep.sh
 
-followed by
+This script populates the data/ directory with .data files (the files used to train and evaluate the model), as well as
+SCP files (intermediate files used by Kaldi).
 
-$ ./train_and_eval.sh
+Next, run
+
+$ ./train_and_eval.sh > train_and_eval.log
+
+This script produces 2 trained models: model-untuned.pt (trained only on NSC data) and model-tuned.pt (fine-tuned on
+IWSLT text-only data). It also evaluates those models in various settings. After the process finishes running,
+train_and_eval.log will contain the entire training log and all evaluation results.
