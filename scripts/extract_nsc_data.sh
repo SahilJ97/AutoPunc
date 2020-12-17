@@ -39,7 +39,7 @@ for speaker_dir in "$common_base"/WAVE/*; do
     wav_scp_file="$OUTPUT_DIR"/2-"$speaker_session"-wav.scp
 
     echo "Aligning audio..."
-    python3 forced_align.py "$speaker_session_transcript" "$audio_dir" "$wav_scp_file" &> /dev/null
+    python3 forced_align.py "$speaker_session_transcript" "$audio_dir" "$wav_scp_file"
 
 
     echo "Computing pitch with deltas..."
