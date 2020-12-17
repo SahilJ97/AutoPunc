@@ -13,7 +13,7 @@ bash extract_nsc_data.sh ~/nsc ../data/nsc/all_data
 python3 split_data.py ../data/nsc/all_data
 
 # Extract IWSLT 2012 test data to ../data/iwslt/tst2012/
-python3 extract_iwslt_test.py ../data/iwslt/en-fr-test/IWSLT12.TED.MT.tst2012.en-fr.en \
+python3 extract_iwslt_test.py ../data/iwslt/en-fr-test/IWSLT12.TED.MT.tst2012.en-fr.en.xml \
  ../data/iwslt/tst2012_audio ../data/iwslt/tst2012_audio
 
 # Extract IWSLT 2012 training data to ../data/iwslt/train.data (one file)
