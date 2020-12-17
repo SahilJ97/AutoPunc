@@ -12,7 +12,7 @@ sleep 10
 bash extract_nsc_data.sh "$NSC_DIR" ../data/nsc/all_data
 
 # Split NSC data into train, dev, and test sets
-python3 split_nsc_data.py ../data/nsc/all_data
+python3 split_nsc_data.py "$(pwd)"/../data/nsc/all_data
 
 # Extract IWSLT 2012 test data to ../data/iwslt/tst2012/
 python3 extract_iwslt_test.py ../data/iwslt/en-fr-test/IWSLT12.TED.MT.tst2012.en-fr.en.xml \

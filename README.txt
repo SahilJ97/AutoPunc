@@ -22,7 +22,7 @@ $ pip3 install -r requirements.txt
 
 Data extraction directly uses two additional open-source tools (besides Kaldi): sph2pipe and the Gentle forced-aligner.
 
-For instructions on downloading and installing sph2pipe, see https://github.com/robd003/sph2pipe .
+For instructions on downloading and installing sph2pipe, see https://github.com/robd003/sph2pipe . Make sure to add the sph2pipe program directory to your PATH variable!
 
 For instructions on downloading and installing Gentle, see https://github.com/lowerquality/gentle .
 
@@ -51,12 +51,16 @@ All files outside of data/ were written by me.
 
 Enter the scripts directory. Then run
 
-$ sudo ./data_prep.sh
+$ sudo -E bash data_prep.sh <PATH_TO_NSC>
 
-This script populates the data/ directory with .data files (the files used to train and evaluate the model), as well as SCP files (intermediate files used by Kaldi).
+where <PATH_TO_NSC> is the location of the NSC root directory as provided by Prof. Beigi. For example,
+
+$ sudo -E bash data_prep.sh ../../nsc
+
+On most machines, this script takes a few days to run. It populates the data/ directory with .data files (the files used to train and evaluate the model), as well as SCP files (intermediate files used by Kaldi). Note that the final .data files already exist in their corresponding locations. Running this script will overwrite them.
 
 Next, run
 
 $ ./train_and_eval.sh > train_and_eval.log
 
-This script produces 2 trained models: model-untuned.pt (trained only on NSC data) and model-tuned.pt (fine-tuned on IWSLT text-only data). It also evaluates those models in various settings. After the process finishes running, train_and_eval.log will contain the entire training log and all evaluation results. It will also contain demos of the end-to-end system (strings punctuated by the model) for both the tuned and untuned models.
+This script produces 2 trained models in the scripts/ directory: model-untuned.pt (trained only on NSC data) and model-tuned.pt (fine-tuned on IWSLT text-only data). It also evaluates those models in various settings. After the process finishes running, train_and_eval.log will contain the entire training log and all evaluation results. It will also contain demos of the end-to-end system (strings punctuated by the model) for both the tuned and untuned models.
