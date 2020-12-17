@@ -2,12 +2,14 @@
 
 # Written by Sahil Jayaram (saj2163) for COMS 6998 (Topics in Computer Science): Fundamentals of Speech Recognition
 
+NSC_DIR=$1  # path to NSC
+
 # Start the Gentle forced aligner as a background process
 docker run -P lowerquality/gentle &
 sleep 10
 
 # Extract NSC data to ../data/nsc/all_data/
-bash extract_nsc_data.sh ~/nsc ../data/nsc/all_data
+bash extract_nsc_data.sh "$NSC_DIR" ../data/nsc/all_data
 
 # Split NSC data into train, dev, and test sets
 python3 split_nsc_data.py ../data/nsc/all_data
