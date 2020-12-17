@@ -38,10 +38,8 @@ for speaker_dir in "$common_base"/WAVE/*; do
     speaker_session=${ss_basename/%.TXT/}
     wav_scp_file="$OUTPUT_DIR"/2-"$speaker_session"-wav.scp
 
-    if [ ! -f "$wav_scp_file" ]; then
-      echo "Aligning audio..."
-      python3 forced_align.py "$speaker_session_transcript" "$audio_dir" "$wav_scp_file" &> /dev/null
-    fi
+    echo "Aligning audio..."
+    python3 forced_align.py "$speaker_session_transcript" "$audio_dir" "$wav_scp_file" &> /dev/null
 
 
     echo "Computing pitch with deltas..."
